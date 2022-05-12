@@ -1,0 +1,184 @@
+﻿using Microsoft.AspNetCore.Mvc;
+using Microsoft.Data.SqlClient;
+using Newtonsoft.Json;
+using System.Data;
+using TuneWebApp01.Models;
+//using System.Text.Json;
+//using System.Text.Json.Serialization;
+//using System.Data.SqlClient;
+
+namespace TuneWebApp01.Controllers
+{
+    [Route("api/[controller]")]
+    [ApiController]
+    //[Produces("application/json")]
+    public class TuneController : ControllerBase
+    {
+        private readonly IConfiguration _configuration;
+        public TuneController(IConfiguration configuration)
+        {
+            _configuration = configuration;
+        }
+
+        //public JsonConverterAttribute(){}
+
+        //private string ConvertDataTableasJSON(DataTable dtable)
+        //{
+        //    return JsonConvert.SerializeObject(dtable);
+        //}
+
+        //public string DataTableToJsonWithJsonNet(DataTable tdata)
+        //{
+        //    return JsonConvert.SerializeObject(tdata);
+        //}
+
+        [HttpGet]
+        public JsonResult Get()
+        //public string Get()
+        {
+            string query = @"
+                            select TuneId, TuneName from
+                            dbo.Tune
+                            ";
+            string sqlDataSource = _configuration.GetConnectionString("TuneAppCon");
+
+            DataTable table = new DataTable();
+            SqlDataReader myReader;
+
+            using (SqlConnection mycon = new SqlConnection(sqlDataSource))
+            {
+                mycon.Open();
+                using (SqlCommand myCommand = new SqlCommand(query, mycon))
+                {
+                    myReader = myCommand.ExecuteReader();
+                    table.Load(myReader);
+                    myReader.Close();
+                    mycon.Close();
+                }
+
+            }
+            JsonConvert.SerializeObject(table);
+            //var jsonobj = ConvertDataTableasJSON(table);
+            //var jsonobj = DataTableToJsonWithJsonNet(table);
+            //string jsonString = JsonSerializer.Serialize(table);
+
+            //return JsonConvert.DeserializeObject<JsonResult>(myReader.ToString());
+            //return new JsonResult("Get Successfully!");
+            return new JsonResult(table);
+
+            //var tunes = new List<Tune> 
+            //{
+            //    new Tune { TuneId = 1, TuneName = "Come Together"},
+            //    new Tune { TuneId = 2, TuneName = "Something"}
+            //};
+
+            //var album = new Album
+            //{
+            //    AlbumId = 1,
+            //    AlbumName = "Abbey Road",
+            //    DateOfJoining = "1969-9-26",
+            //    PhotoFileName = "anonymous.png",
+            //    //Tune = tunes
+            //};
+
+            //var options = new JsonSerializerOptions
+            //{
+            //    WriteIndented = true,
+            //};
+            //return JsonSerializer.Serialize(album, options);
+        }
+
+        [HttpPost]
+        public JsonResult Post(Tune tune)
+        {
+            string query = @"
+                            insert into dbo.Tune
+                            values (@TuneName)
+                            ";
+            string sqlDataSource = _configuration.GetConnectionString("TuneAppCon");
+
+            DataTable table = new DataTable();
+            SqlDataReader myReader;
+
+            using (SqlConnection mycon = new SqlConnection(sqlDataSource))
+            {
+                mycon.Open();
+                using (SqlCommand myCommand = new SqlCommand(query, mycon))
+                {
+                    myCommand.Parameters.AddWithValue("@TuneName", tune.TuneName);
+                    myReader = myCommand.ExecuteReader();
+                    table.Load(myReader);
+                    myReader.Close();
+                    mycon.Close();
+                }
+            }
+            JsonConvert.SerializeObject(table);
+
+            return new JsonResult("Post Successfully!!");
+            //return new JsonResult(table);
+        }
+
+        [HttpPut]
+        public JsonResult Put(Tune tune)
+        {
+            string query = @"
+                            update dbo.Tune
+                            set TuneName=@TuneName
+                            where TuneId=@TuneId
+                            ";
+            string sqlDataSource = _configuration.GetConnectionString("TuneAppCon");
+
+            DataTable table = new DataTable();
+            SqlDataReader myReader;
+
+            using (SqlConnection mycon = new SqlConnection(sqlDataSource))
+            {
+                mycon.Open();
+                using (SqlCommand myCommand = new SqlCommand(query, mycon))
+                {
+                    myCommand.Parameters.AddWithValue("@TuneId", tune.TuneId);
+                    myCommand.Parameters.AddWithValue("@TuneName", tune.TuneName);
+                    myReader = myCommand.ExecuteReader();
+                    table.Load(myReader);
+                    myReader.Close();
+                    mycon.Close();
+                }
+            }
+            JsonConvert.SerializeObject(table);
+
+            return new JsonResult("Update Successfully!!!");
+            //return new JsonResult(table);
+        }
+
+        [HttpDelete("{id}")]
+        public JsonResult Delete(int id)
+        {
+            string query = @"
+                            delete from dbo.Tune
+                            where TuneId=@TuneId
+                            ";
+            string sqlDataSource = _configuration.GetConnectionString("TuneAppCon");
+
+            DataTable table = new DataTable();
+            SqlDataReader myReader;
+
+            using (SqlConnection mycon = new SqlConnection(sqlDataSource))
+            {
+                mycon.Open();
+                using (SqlCommand myCommand = new SqlCommand(query, mycon))
+                {
+                    myCommand.Parameters.AddWithValue("@TuneId", id);
+                    myReader = myCommand.ExecuteReader();
+                    table.Load(myReader);
+                    myReader.Close();
+                    mycon.Close();
+                }
+            }
+            JsonConvert.SerializeObject(table);
+
+            return new JsonResult("Delete Successfully.");
+            //return new JsonResult(table);
+        }
+    }
+
+}
