@@ -14,19 +14,16 @@ namespace TuneWebApp01.Controllers
     {
         private readonly IConfiguration _configuration;
         private readonly IWebHostEnvironment _env;
-        public AlbumController(IConfiguration configuration, IWebHostEnvironment env)
+        public AlbumController(IConfiguration configuration)
         {
             _configuration = configuration;
-            _env = env;
         }
 
         [HttpGet]
         public JsonResult Get()
         {
             string query = @"
-                            select AlbumId, AlbumName, Tune,
-                            convert(varchar(10),DateOfJoining,120) as DateOfJoining,photoFileName
-                            from
+                            select AlbumId, AlbumName from
                             dbo.Album
                             ";
             string sqlDataSource = _configuration.GetConnectionString("TuneAppCon");
@@ -47,8 +44,8 @@ namespace TuneWebApp01.Controllers
             }
             JsonConvert.SerializeObject(table);
 
-            return new JsonResult("Get Successfully!");
-            //return new JsonResult(table);
+            //return new JsonResult("Get Successfully!");
+            return new JsonResult(table);
         }
 
         [HttpPost]
@@ -56,8 +53,7 @@ namespace TuneWebApp01.Controllers
         {
             string query = @"
                             insert into dbo.Album
-                            (AlbumName, Tune, DateOfJoining, PhotoFileName)
-                            values (@AlbumName, @Tune, @DateOfJoining, @PhotoFileName)
+                            values (@AlbumName)
                             ";
             string sqlDataSource = _configuration.GetConnectionString("TuneAppCon");
 
@@ -70,9 +66,9 @@ namespace TuneWebApp01.Controllers
                 using (SqlCommand myCommand = new SqlCommand(query, mycon))
                 {
                     myCommand.Parameters.AddWithValue("@AlbumName", album.AlbumName);
-                    myCommand.Parameters.AddWithValue("@Tune", album.Tune);
-                    myCommand.Parameters.AddWithValue("@DateOfJoining", album.DateOfJoining);
-                    myCommand.Parameters.AddWithValue("@PhotoFileName", album.PhotoFileName);
+                    //myCommand.Parameters.AddWithValue("@Tune", album.Tune);
+                    //myCommand.Parameters.AddWithValue("@DateOfJoining", album.DateOfJoining);
+                    //myCommand.Parameters.AddWithValue("@PhotoFileName", album.PhotoFileName);
 
                     myReader = myCommand.ExecuteReader();
                     table.Load(myReader);
@@ -82,8 +78,8 @@ namespace TuneWebApp01.Controllers
             }
             JsonConvert.SerializeObject(table);
 
-            return new JsonResult("Post Successfully!!");
-            //return new JsonResult(table);
+            //return new JsonResult("Post Successfully!!");
+            return new JsonResult(table);
         }
 
         [HttpPut]
@@ -91,11 +87,8 @@ namespace TuneWebApp01.Controllers
         {
             string query = @"
                             update dbo.Album
-                            set AlbumName =@AlbumName,
-                            Tune =@Tune,
-                            DateOfJoining =@DateOfJoining,
-                            PhotoFileName =@PhotoFileName
-                            where AlbumId =@AlbumId
+                            set AlbumName=@AlbumName
+                            where AlbumId=@AlbumId
                             ";
             string sqlDataSource = _configuration.GetConnectionString("TuneAppCon");
 
@@ -107,10 +100,11 @@ namespace TuneWebApp01.Controllers
                 mycon.Open();
                 using (SqlCommand myCommand = new SqlCommand(query, mycon))
                 {
+                    myCommand.Parameters.AddWithValue("@AlbumId", album.AlbumId);
                     myCommand.Parameters.AddWithValue("@AlbumName", album.AlbumName);
-                    myCommand.Parameters.AddWithValue("@Tune", album.Tune);
-                    myCommand.Parameters.AddWithValue("@DateOfJoining", album.DateOfJoining);
-                    myCommand.Parameters.AddWithValue("@PhotoFileName", album.PhotoFileName);
+                    //myCommand.Parameters.AddWithValue("@Tune", album.Tune);
+                    //myCommand.Parameters.AddWithValue("@DateOfJoining", album.DateOfJoining);
+                    //myCommand.Parameters.AddWithValue("@PhotoFileName", album.PhotoFileName);
 
                     myReader = myCommand.ExecuteReader();
                     table.Load(myReader);
@@ -120,8 +114,8 @@ namespace TuneWebApp01.Controllers
             }
             JsonConvert.SerializeObject(table);
 
-            return new JsonResult("Update Successfully!!!");
-            //return new JsonResult(table);
+            //return new JsonResult("Update Successfully!!!");
+            return new JsonResult(table);
         }
 
         [HttpDelete("{id}")]
@@ -150,31 +144,31 @@ namespace TuneWebApp01.Controllers
             }
             JsonConvert.SerializeObject(table);
 
-            return new JsonResult("Delete Successfully.");
-            //return new JsonResult(table);
+            //return new JsonResult("Delete Successfully.");
+            return new JsonResult(table);
         }
 
-        [Route("SaveFile")]
-        [HttpPost]
-        public JsonResult SaveFile()
-        {
-            try
-            {
-                var httpRequest = Request.Form;
-                var postedFile = httpRequest.Files[0];
-                string filename = postedFile.FileName;
-                var physicalPath = _env.ContentRootPath +"/Photos/" + filename;
+        //[Route("SaveFile")]
+        //[HttpPost]
+        //public JsonResult SaveFile()
+        //{
+        //    try
+        //    {
+        //        var httpRequest = Request.Form;
+        //        var postedFile = httpRequest.Files[0];
+        //        string filename = postedFile.FileName;
+        //        var physicalPath = _env.ContentRootPath +"/Photos/" + filename;
 
-                using(var stream = new FileStream(physicalPath, FileMode.Create))
-                {
-                    postedFile.CopyTo(stream);
-                }
-                return new JsonResult(filename);
-            }
-            catch (Exception)
-            {
-                return new JsonResult("anonymous.png");
-            }
-        }
+        //        using(var stream = new FileStream(physicalPath, FileMode.Create))
+        //        {
+        //            postedFile.CopyTo(stream);
+        //        }
+        //        return new JsonResult(filename);
+        //    }
+        //    catch (Exception)
+        //    {
+        //        return new JsonResult("anonymous.png");
+        //    }
+        //}
     }
 }

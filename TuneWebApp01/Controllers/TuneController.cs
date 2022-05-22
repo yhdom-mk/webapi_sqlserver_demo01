@@ -15,9 +15,11 @@ namespace TuneWebApp01.Controllers
     public class TuneController : ControllerBase
     {
         private readonly IConfiguration _configuration;
-        public TuneController(IConfiguration configuration)
+        private readonly IWebHostEnvironment _env;
+        public TuneController(IConfiguration configuration, IWebHostEnvironment env)
         {
             _configuration = configuration;
+            _env = env;
         }
 
         //public JsonConverterAttribute(){}
@@ -37,7 +39,9 @@ namespace TuneWebApp01.Controllers
         //public string Get()
         {
             string query = @"
-                            select TuneId, TuneName from
+                            select TuneId, TuneName, Album,
+                            convert(varchar(10),DateOfJoining,120) as DateOfJoining,photoFileName
+                            from
                             dbo.Tune
                             ";
             string sqlDataSource = _configuration.GetConnectionString("TuneAppCon");
@@ -93,7 +97,8 @@ namespace TuneWebApp01.Controllers
         {
             string query = @"
                             insert into dbo.Tune
-                            values (@TuneName)
+                            (TuneName, Album, DateOfJoining, PhotoFileName)
+                            values (@TuneName, @Album, @DateOfJoining, @PhotoFileName)
                             ";
             string sqlDataSource = _configuration.GetConnectionString("TuneAppCon");
 
@@ -106,6 +111,10 @@ namespace TuneWebApp01.Controllers
                 using (SqlCommand myCommand = new SqlCommand(query, mycon))
                 {
                     myCommand.Parameters.AddWithValue("@TuneName", tune.TuneName);
+                    myCommand.Parameters.AddWithValue("@Album", tune.Album);
+                    myCommand.Parameters.AddWithValue("@DateOfJoining", tune.DateOfJoining);
+                    myCommand.Parameters.AddWithValue("@PhotoFileName", tune.PhotoFileName);
+                    //myCommand.Parameters.AddWithValue("@TuneName", tune.TuneName);
                     myReader = myCommand.ExecuteReader();
                     table.Load(myReader);
                     myReader.Close();
@@ -114,8 +123,8 @@ namespace TuneWebApp01.Controllers
             }
             JsonConvert.SerializeObject(table);
 
-            return new JsonResult("Post Successfully!!");
-            //return new JsonResult(table);
+            //return new JsonResult("Post Successfully!!");
+            return new JsonResult(table);
         }
 
         [HttpPut]
@@ -123,8 +132,11 @@ namespace TuneWebApp01.Controllers
         {
             string query = @"
                             update dbo.Tune
-                            set TuneName=@TuneName
-                            where TuneId=@TuneId
+                            set TuneName =@TuneName,
+                            Album =@Album,
+                            DateOfJoining =@DateOfJoining,
+                            PhotoFileName =@PhotoFileName
+                            where TuneId =@TuneId
                             ";
             string sqlDataSource = _configuration.GetConnectionString("TuneAppCon");
 
@@ -136,8 +148,12 @@ namespace TuneWebApp01.Controllers
                 mycon.Open();
                 using (SqlCommand myCommand = new SqlCommand(query, mycon))
                 {
-                    myCommand.Parameters.AddWithValue("@TuneId", tune.TuneId);
                     myCommand.Parameters.AddWithValue("@TuneName", tune.TuneName);
+                    myCommand.Parameters.AddWithValue("@Album", tune.Album);
+                    myCommand.Parameters.AddWithValue("@DateOfJoining", tune.DateOfJoining);
+                    myCommand.Parameters.AddWithValue("@PhotoFileName", tune.PhotoFileName);
+                    //myCommand.Parameters.AddWithValue("@TuneId", tune.TuneId);
+                    //myCommand.Parameters.AddWithValue("@TuneName", tune.TuneName);
                     myReader = myCommand.ExecuteReader();
                     table.Load(myReader);
                     myReader.Close();
@@ -146,8 +162,8 @@ namespace TuneWebApp01.Controllers
             }
             JsonConvert.SerializeObject(table);
 
-            return new JsonResult("Update Successfully!!!");
-            //return new JsonResult(table);
+            //return new JsonResult("Update Successfully!!!");
+            return new JsonResult(table);
         }
 
         [HttpDelete("{id}")]
@@ -176,9 +192,31 @@ namespace TuneWebApp01.Controllers
             }
             JsonConvert.SerializeObject(table);
 
-            return new JsonResult("Delete Successfully.");
-            //return new JsonResult(table);
+            //return new JsonResult("Delete Successfully.");
+            return new JsonResult(table);
+        }
+
+        [Route("SaveFile")]
+        [HttpPost]
+        public JsonResult SaveFile()
+        {
+            try
+            {
+                var httpRequest = Request.Form;
+                var postedFile = httpRequest.Files[0];
+                string filename = postedFile.FileName;
+                var physicalPath = _env.ContentRootPath + "/Photos/" + filename;
+
+                using (var stream = new FileStream(physicalPath, FileMode.Create))
+                {
+                    postedFile.CopyTo(stream);
+                }
+                return new JsonResult(filename);
+            }
+            catch (Exception)
+            {
+                return new JsonResult("anonymous.png");
+            }
         }
     }
-
 }
