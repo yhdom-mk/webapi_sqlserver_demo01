@@ -13,7 +13,7 @@ namespace TuneWebApp01.Controllers
     public class AlbumController : ControllerBase
     {
         private readonly IConfiguration _configuration;
-        private readonly IWebHostEnvironment _env;
+        //private readonly IWebHostEnvironment _env;
         public AlbumController(IConfiguration configuration)
         {
             _configuration = configuration;

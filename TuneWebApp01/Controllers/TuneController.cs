@@ -110,6 +110,7 @@ namespace TuneWebApp01.Controllers
                 mycon.Open();
                 using (SqlCommand myCommand = new SqlCommand(query, mycon))
                 {
+                    //myCommand.Parameters.AddWithValue("@TuneId", tune.TuneId);
                     myCommand.Parameters.AddWithValue("@TuneName", tune.TuneName);
                     myCommand.Parameters.AddWithValue("@Album", tune.Album);
                     myCommand.Parameters.AddWithValue("@DateOfJoining", tune.DateOfJoining);
@@ -132,12 +133,14 @@ namespace TuneWebApp01.Controllers
         {
             string query = @"
                             update dbo.Tune
-                            set TuneName =@TuneName,
+                            set 
+                            TuneId =@TuneId,
+                            TuneName =@TuneName,
                             Album =@Album,
                             DateOfJoining =@DateOfJoining,
                             PhotoFileName =@PhotoFileName
-                            where TuneId =@TuneId
-                            ";
+                            
+                            "; //where TuneId =@TuneId
             string sqlDataSource = _configuration.GetConnectionString("TuneAppCon");
 
             DataTable table = new DataTable();
@@ -148,6 +151,7 @@ namespace TuneWebApp01.Controllers
                 mycon.Open();
                 using (SqlCommand myCommand = new SqlCommand(query, mycon))
                 {
+                    myCommand.Parameters.AddWithValue("@TuneId", tune.TuneId);
                     myCommand.Parameters.AddWithValue("@TuneName", tune.TuneName);
                     myCommand.Parameters.AddWithValue("@Album", tune.Album);
                     myCommand.Parameters.AddWithValue("@DateOfJoining", tune.DateOfJoining);
