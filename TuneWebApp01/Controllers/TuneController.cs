@@ -139,7 +139,7 @@ namespace TuneWebApp01.Controllers
                             Album =@Album,
                             DateOfJoining =@DateOfJoining,
                             PhotoFileName =@PhotoFileName
-                            
+                            where TuneId =@TuneId
                             "; //where TuneId =@TuneId
             string sqlDataSource = _configuration.GetConnectionString("TuneAppCon");
 
