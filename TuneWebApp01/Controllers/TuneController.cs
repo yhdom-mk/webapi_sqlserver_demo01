@@ -39,8 +39,10 @@ namespace TuneWebApp01.Controllers
         //public string Get()
         {
             string query = @"
-                            select TuneId, TuneName, Album,
-                            convert(varchar(10),DateOfJoining,120) as DateOfJoining,photoFileName
+                            select
+                            TuneId, TuneName, Album,
+                            convert(varchar(10),DateOfJoining,120) as DateOfJoining,
+                            photoFileName
                             from
                             dbo.Tune
                             ";
@@ -132,6 +134,7 @@ namespace TuneWebApp01.Controllers
         public JsonResult Put(Tune tune)
         {
             string query = @"
+                            set identity_insert dbo.Tune on
                             update dbo.Tune
                             set 
                             TuneId =@TuneId,
@@ -139,7 +142,9 @@ namespace TuneWebApp01.Controllers
                             Album =@Album,
                             DateOfJoining =@DateOfJoining,
                             PhotoFileName =@PhotoFileName
-                            where TuneId =@TuneId
+                            where 
+                            TuneId =@TuneId
+                            set identity_insert dbo.Tune off
                             "; //where TuneId =@TuneId
             string sqlDataSource = _configuration.GetConnectionString("TuneAppCon");
 
