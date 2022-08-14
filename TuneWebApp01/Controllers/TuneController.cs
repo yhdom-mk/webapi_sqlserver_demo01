@@ -227,5 +227,19 @@ namespace TuneWebApp01.Controllers
                 return new JsonResult("anonymous.png");
             }
         }
+
+        public void GetImageFile(object sender, EventArgs e)
+        {
+            //string iconPath = @"C:\test\image.ico";
+            //System.Drawing.Icon icon = new System.Drawing.Icon(iconPath, 48, 48);
+            ////Bitmapに変換
+            //System.Drawing.Bitmap bmp = icon.ToBitmap();
+            //icon.Dispose();
+            //FileStream fileStream = File.OpenRead(@"C:\test\image.jpg");
+
+            //get programFolder
+            var programFilesPath = Environment.GetFolderPath(Environment.SpecialFolder.ProgramFiles);
+            Console.WriteLine(programFilesPath);
+        }
     }
 }
