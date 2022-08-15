@@ -3,6 +3,9 @@ using TuneWebApp01.Models;
 //using Newtonsoft.Json;
 //using Newtonsoft.Json.Converters;
 using Newtonsoft.Json.Serialization;
+using Microsoft.AspNetCore.Builder;
+using System.Drawing;
+using Microsoft.AspNetCore.Http;
 //using System.Text.Encodings.Web;
 //using System.Text.Json;
 //using System.Text.Unicode;
@@ -60,6 +63,16 @@ app.UseStaticFiles(new StaticFileOptions
         Path.Combine(Directory.GetCurrentDirectory(), "Photos")
     ),
     RequestPath = "/Photos"
+});
+
+app.UseEndpoints(endpoints =>
+{
+    endpoints.MapGet("/SaveFile", async context =>
+    {
+        Bitmap bmp = new Bitmap("image.bmp");
+        context.Response.ContentType = "text/plain; charset=utf-8";
+        await context.Response.WriteAsync( "bitmap‚Ì•"+ bmp.Width, System.Text.Encoding.UTF8);
+    });
 });
 
 app.Run();
