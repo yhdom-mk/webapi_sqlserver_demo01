@@ -237,6 +237,12 @@ namespace TuneWebApp01.Controllers
             //icon.Dispose();
             //FileStream fileStream = File.OpenRead(@"C:\test\image.jpg");
 
+            //Image.FromFile
+            //System.Drawing.Image img = System.Drawing.Image.FromFile(@"C:\test\image.jpg");
+
+            //Bitmap
+            //System.Drawing.Bitmap btp = new System.Drawing.Bitmap(@"C:\test\image.jpg");
+
             //get programFolder
             var programFilesPath = Environment.GetFolderPath(Environment.SpecialFolder.ProgramFiles);
             Console.WriteLine(programFilesPath);
